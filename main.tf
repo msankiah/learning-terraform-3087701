@@ -99,7 +99,7 @@ resource "aws_security_group_rule" "blog_all_out" {
 module "blog_alb" {
   source = "terraform-aws-modules/alb/aws"
 
-  name    = "blog_alb"
+  name    = "blog-alb"
   vpc_id  = "module.blog.vpc.vpc_id"
   subnets = ["smodule.blog_vpc.public_subnets"]
 
