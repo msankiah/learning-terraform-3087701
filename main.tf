@@ -96,5 +96,39 @@ resource "aws_security_group_rule" "blog_all_out" {
   security_group_id = aws_security_group.blog.id
 }
 
+module "blog_alb" {
+  source = "terraform-aws-modules/alb/aws"
 
+  name    = "blog_alb"
+  vpc_id  = "module.blog.vpc.vpc_id"
+  subnets = ["smodule.blog_vpc.public_subnets"]
+
+  security_groups = [module.blog_sg.security_group_id]  
+
+  listeners = {
+    blog-http = {
+      port     = 80
+      protocol = "HTTP"
+      forward = {
+        target_groups_arn = aws_lb_target_group.blog.arn.
+      }
+    }
+  }
+
+  tags = {
+    Environment = "dev"
+  }
+}
  
+resource "aws_lb_target_group" "blog" {
+  name     = "blog"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = module.blog_vpc.vpc_id
+}
+
+resource "aws_lb_target_group_attachment" "blog" {
+  target_group_arn = aws_lb_target_group.blog.arn
+  target_id        = aws_instance.blog.id
+  port             = 80
+}
